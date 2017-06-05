@@ -43,6 +43,7 @@ type args struct {
 	Include []string `arg:"-i,separate,help:include lines which match patterns"`
 	Exclude []string `arg:"-e,separate,help:exclude lines which match patterns"`
 	Tail    []string `arg:"positional,help:highlight patters"`
+	Debug   bool
 }
 
 func (args) Description() string {
@@ -57,9 +58,13 @@ func main() {
 	var args args
 	arg.MustParse(&args)
 
-	re := regexp.MustCompile(generateRegExp(&args.Tail))
+	tailRe := prepareRegExp(&args.Tail)
+	includeRe := prepareRegExp(&args.Include)
+	excudeRe := prepareRegExp(&args.Exclude)
+
 	scanner := bufio.NewScanner(os.Stdin)
 
+	// Highlight matched pattern
 	colourify := func(match string) string {
 		index, err := getIndex(&args.Tail, match)
 		if err != nil {
@@ -67,9 +72,39 @@ func main() {
 		}
 		return terminalColours[index] + match + colourEnd
 	}
+
 	for scanner.Scan() {
-		fmt.Printf(re.ReplaceAllStringFunc(scanner.Text(), colourify) + "\n")
+		newLine := scanner.Text()
+
+		// Check if the line should be included in the output
+		if includeRe != nil {
+			if !includeRe.MatchString(newLine) {
+				continue
+			}
+		}
+
+		// Check if the line should be excluded from the output
+		if excudeRe != nil {
+			if excudeRe.MatchString(newLine) {
+				continue
+			}
+		}
+
+		// Print original or colourified line
+		if tailRe != nil {
+			fmt.Printf(tailRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
+		} else {
+			fmt.Println(newLine)
+		}
 	}
+}
+
+// Returns nil or compiled regexp
+func prepareRegExp(args *[]string) *regexp.Regexp {
+	if len(*args) == 0 {
+		return nil
+	}
+	return regexp.MustCompile(generateRegExp(args))
 }
 
 // Returns regular expression which is used for colourization
