@@ -24,6 +24,6 @@ Options:
 ```
 kažy is extremely useful when piping a command:
 ```bash
-tail saturday | kazy sunny " " "###" 22 rain
+./kazy -h | ./kazy include exclude lines "match patterns" -e version
 ```
 ![ScreenShot](https://raw.githubusercontent.com/jsnjack/kazy-go/master/screenshot.png)
