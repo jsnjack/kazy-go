@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+
+	arg "github.com/alexflint/go-arg"
 )
 
+var version = "kažy 1.0"
 var colourEnd = "\033[0m"
 
 var terminalColours = []string{
@@ -36,13 +39,29 @@ var terminalColours = []string{
 	"\033[96m",
 }
 
+type args struct {
+	Include []string `arg:"-i,separate,help:include lines which match patterns"`
+	Exclude []string `arg:"-e,separate,help:exclude lines which match patterns"`
+	Tail    []string `arg:"positional,help:highlight patters"`
+}
+
+func (args) Description() string {
+	return "Highlights output from STDIN"
+}
+
+func (args) Version() string {
+	return version
+}
+
 func main() {
-	args := os.Args[1:]
-	re := regexp.MustCompile(generateRegExp(&args))
+	var args args
+	arg.MustParse(&args)
+
+	re := regexp.MustCompile(generateRegExp(&args.Tail))
 	scanner := bufio.NewScanner(os.Stdin)
 
 	colourify := func(match string) string {
-		index, err := getIndex(&args, match)
+		index, err := getIndex(&args.Tail, match)
 		if err != nil {
 			return match
 		}
