@@ -10,7 +10,7 @@ import (
 	arg "github.com/alexflint/go-arg"
 )
 
-var version = "kažy 1.0"
+var version = "1.0"
 var colourEnd = "\033[0m"
 
 var terminalColours = []string{
