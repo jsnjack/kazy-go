@@ -59,13 +59,18 @@ func main() {
 
 	tailRe := prepareRegExp(&args.Tail)
 	includeRe := prepareRegExp(&args.Include)
-	excudeRe := prepareRegExp(&args.Exclude)
+	excludeRe := prepareRegExp(&args.Exclude)
 
 	scanner := bufio.NewScanner(os.Stdin)
 
+	process(scanner, &args.Tail, tailRe, includeRe, excludeRe)
+}
+
+// Process data from STDIN
+func process(scanner *bufio.Scanner, argsTail *[]string, tailRe *regexp.Regexp, includeRe *regexp.Regexp, excludeRe *regexp.Regexp) {
 	// Highlight matched pattern
 	colourify := func(match string) string {
-		index, err := getIndex(&args.Tail, match)
+		index, err := getIndex(argsTail, match)
 		if err != nil {
 			return match
 		}
@@ -83,8 +88,8 @@ func main() {
 		}
 
 		// Check if the line should be excluded from the output
-		if excudeRe != nil {
-			if excudeRe.MatchString(newLine) {
+		if excludeRe != nil {
+			if excludeRe.MatchString(newLine) {
 				continue
 			}
 		}
