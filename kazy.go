@@ -43,7 +43,6 @@ type args struct {
 	Include []string `arg:"-i,separate,help:include lines which match patterns"`
 	Exclude []string `arg:"-e,separate,help:exclude lines which match patterns"`
 	Tail    []string `arg:"positional,help:highlight patters"`
-	Debug   bool
 }
 
 func (args) Description() string {
