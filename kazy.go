@@ -125,7 +125,7 @@ func generateRegExp(args *[]string) string {
 		}
 		re = re + "(" + value + ")"
 	}
-	return re
+	return regexp.QuoteMeta(re)
 }
 
 // Returns position of the element in the array

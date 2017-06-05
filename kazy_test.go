@@ -127,6 +127,11 @@ func TestExcludeIncludeString(t *testing.T) {
 	assertEqual(t, result, expected)
 }
 
+func TestEscapeInRegexp(t *testing.T) {
+	test := []string{"["}
+	prepareRegExp(&test)
+}
+
 func BenchmarkProcess(b *testing.B) {
 	const sample = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 
