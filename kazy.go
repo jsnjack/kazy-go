@@ -10,7 +10,7 @@ import (
 	arg "github.com/alexflint/go-arg"
 )
 
-var version = "1.0.2"
+var version = "1.0.3"
 var colourEnd = "\033[0m"
 
 var terminalColours = []string{
@@ -123,9 +123,9 @@ func generateRegExp(args *[]string) string {
 		if len(re) > 0 {
 			re = re + "|"
 		}
-		re = re + "(" + value + ")"
+		re = re + "(" + regexp.QuoteMeta(value) + ")"
 	}
-	return regexp.QuoteMeta(re)
+	return re
 }
 
 // Returns position of the element in the array

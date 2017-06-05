@@ -112,6 +112,19 @@ func TestColourifyPercentString(t *testing.T) {
 	assertEqual(t, result, expected)
 }
 
+func TestColourifySquareBracketString(t *testing.T) {
+	const input = "["
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	argsTail := []string{input}
+	var tailRe *regexp.Regexp
+	tailRe = prepareRegExp(&argsTail)
+
+	expected := []byte("\033[46m[\033[0m\n")
+
+	result := runProcess(scanner, &argsTail, tailRe, nil, nil)
+	assertEqual(t, result, expected)
+}
+
 func TestExcludeIncludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
