@@ -10,7 +10,7 @@ import (
 	arg "github.com/alexflint/go-arg"
 )
 
-var version = "1.0"
+var version = "1.0.1"
 var colourEnd = "\033[0m"
 
 var terminalColours = []string{
@@ -56,6 +56,11 @@ func (args) Version() string {
 func main() {
 	var args args
 	arg.MustParse(&args)
+
+	if len(args.Tail) > len(terminalColours) {
+		fmt.Printf("Tail limit reached: %v \n", len(terminalColours))
+		os.Exit(1)
+	}
 
 	tailRe := prepareRegExp(&args.Tail)
 	includeRe := prepareRegExp(&args.Include)
