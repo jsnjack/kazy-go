@@ -10,7 +10,7 @@ import (
 	arg "github.com/alexflint/go-arg"
 )
 
-var version = "1.0.1"
+var version = "1.0.2"
 var colourEnd = "\033[0m"
 
 var terminalColours = []string{
@@ -101,7 +101,7 @@ func process(scanner *bufio.Scanner, argsTail *[]string, tailRe *regexp.Regexp, 
 
 		// Print original or colourified line
 		if tailRe != nil {
-			fmt.Printf(tailRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
+			fmt.Print(tailRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
 		} else {
 			fmt.Println(newLine)
 		}
