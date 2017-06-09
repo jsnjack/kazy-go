@@ -2,3 +2,4 @@ kazy
 kazy-go
 .vscode
 kazy.log
+.coverage

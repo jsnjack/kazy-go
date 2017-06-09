@@ -4,6 +4,9 @@ GITHUB_ACCESS_TOKEN?=
 test:
 	go test
 
+coverage:
+	go test -coverprofile .coverage && go tool cover -func=.coverage&& go tool cover -html=.coverage
+
 build:
 	go build -o ${BINARY}
 
