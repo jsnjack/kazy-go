@@ -1,6 +1,8 @@
 kažy-go
 ====
 
+[![CircleCI](https://circleci.com/gh/jsnjack/kazy-go.svg?style=svg)](https://circleci.com/gh/jsnjack/kazy-go)
+
 ### What is it?
 kažy-go is an implementation of the https://github.com/jsnjack/kazy in golang
 
