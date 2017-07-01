@@ -10,7 +10,7 @@ import (
 	arg "github.com/alexflint/go-arg"
 )
 
-var version = "1.0.3"
+var version = "1.0.4"
 
 type args struct {
 	Include []string `arg:"-i,separate,help:include lines which match patterns"`
