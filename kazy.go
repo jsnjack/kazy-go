@@ -72,7 +72,7 @@ func process(scanner *bufio.Scanner, argsTail *[]string, tailRe *regexp.Regexp, 
 			}
 		}
 
-		// Print original or colourified line
+		// Print original or colorized line
 		if tailRe != nil {
 			fmt.Print(tailRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
 		} else {
@@ -89,7 +89,7 @@ func prepareRegExp(args *[]string) *regexp.Regexp {
 	return regexp.MustCompile(generateRegExp(args))
 }
 
-// Returns regular expression which is used for colourization
+// Returns regular expression which is used for colorization
 func generateRegExp(args *[]string) string {
 	re := ""
 	for _, value := range *args {
