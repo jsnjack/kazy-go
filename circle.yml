@@ -8,6 +8,7 @@ deployment:
   production:
     branch: master
     commands:
+      - make build
       - make dist
       - cp -R dist/* $CIRCLE_ARTIFACTS
       - package_cloud push jsnjack/kazy-go/debian/jessie $(cd dist && find .  -name "*.deb")
