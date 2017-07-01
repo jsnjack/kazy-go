@@ -1,0 +1,14 @@
+dependencies:
+  pre:
+    - gem install package_cloud
+    - gem install fpm
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - make dist
+      - cp -R dist/* $CIRCLE_ARTIFACTS
+      - package_cloud push jsnjack/kazy-go/debian/jessie $(cd dist && find .  -name "*.deb")
+      - package_cloud push jsnjack/kazy-go/debian/stretch $(cd dist && find .  -name "*.deb")
+      - package_cloud push jsnjack/kazy-go/fedora/25 $(cd dist && find .  -name "*.rpm")
