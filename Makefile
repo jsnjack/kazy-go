@@ -25,4 +25,4 @@ dist: build
 clean:
 	go clean
 
-.PHONY: dist build
+.PHONY: dist
