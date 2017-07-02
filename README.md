@@ -29,3 +29,15 @@ kažy is extremely useful when piping a command:
 ./kazy -h | ./kazy include exclude lines "match patterns" -e version
 ```
 ![ScreenShot](https://raw.githubusercontent.com/jsnjack/kazy-go/master/screenshot.png)
+
+### How to install
+
+#### Debian
+```bash
+curl -s https://packagecloud.io/install/repositories/jsnjack/kazy-go/script.deb.sh | sudo bash
+```
+
+#### Fedora
+```bash
+curl -s https://packagecloud.io/install/repositories/jsnjack/kazy-go/script.rpm.sh | sudo bash
+```
