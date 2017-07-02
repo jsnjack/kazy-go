@@ -12,7 +12,7 @@ deployment:
       - make build
       - make dist
       - cp -R dist/* $CIRCLE_ARTIFACTS
-      - package_cloud push jsnjack/kazy-go/debian/jessie $(find dist -name "*.deb")
-      - package_cloud push jsnjack/kazy-go/debian/stretch $(find dist -name "*.deb")
-      - package_cloud push jsnjack/kazy-go/fedora/25 $(find dist -name "*.rpm")
+      - package_cloud push jsnjack/kazy-go/debian/jessie $(find dist -name "*.deb") --skip-errors
+      - package_cloud push jsnjack/kazy-go/debian/stretch $(find dist -name "*.deb") --skip-errors
+      - package_cloud push jsnjack/kazy-go/fedora/25 $(find dist -name "*.rpm") --skip-errors
       - deb-s3 upload --bucket surfly-repo --access-key-id=$SURFLY_REPO_ACCESS_KEY --secret-access-key=$SURFLY_REPO_SECRET_KEY --codename=surfly-debian $(find dist -name "*.deb")
