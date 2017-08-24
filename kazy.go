@@ -10,7 +10,7 @@ import (
 	arg "github.com/alexflint/go-arg"
 )
 
-var version = "1.0.5"
+var version = "1.0.6"
 
 type args struct {
 	Include []string `arg:"-i,separate,help:include lines which match patterns"`
@@ -40,6 +40,9 @@ func main() {
 	excludeRe := prepareRegExp(&args.Exclude)
 
 	scanner := bufio.NewScanner(os.Stdin)
+	// Update max string size from 64 to 1024
+	buffer := make([]byte, 0, 64*1024)
+	scanner.Buffer(buffer, 1024*1024)
 
 	process(scanner, &args.Tail, tailRe, includeRe, excludeRe)
 }
@@ -78,6 +81,10 @@ func process(scanner *bufio.Scanner, argsTail *[]string, tailRe *regexp.Regexp, 
 		} else {
 			fmt.Println(newLine)
 		}
+	}
+	err := scanner.Err()
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 }
 
