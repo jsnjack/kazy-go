@@ -1,8 +1,15 @@
 BINARY:=kazy
 PWD:=$(shell pwd)
 BUILD_TYPES:=rpm deb
-VERSION:=$(shell ./${BINARY} --version)
+VERSION=0.0.0
+MONOVA:=$(shell monova -version dot 2> /dev/null)
 
+version:
+ifdef MONOVA
+override VERSION="$(shell monova)"
+else
+	$(info "Install monova (https://github.com/jsnjack/monova) to calculate version")
+endif
 
 test:
 	go test
@@ -10,8 +17,8 @@ test:
 coverage:
 	go test -coverprofile .coverage && go tool cover -html=.coverage && go tool cover -html=.coverage
 
-build:
-	go build -o ${BINARY}
+build: version
+	go build -ldflags="-X main.version=${VERSION}" -o ${BINARY}
 
 dist: build
 	@for type in ${BUILD_TYPES} ; do \
