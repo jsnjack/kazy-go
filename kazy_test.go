@@ -205,3 +205,18 @@ func BenchmarkProcess(b *testing.B) {
 		process(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
 	}
 }
+
+func BenchmarkProcessWithLimit(b *testing.B) {
+	const sample = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
+
+	scanner := bufio.NewScanner(strings.NewReader(sample))
+	var argsTail []string
+	argsLimit := 50
+	var tailRe *regexp.Regexp
+	tailRe = regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		process(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
+	}
+}
