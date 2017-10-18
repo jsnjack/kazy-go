@@ -41,12 +41,14 @@ func runProcess(
 	excludeRe *regexp.Regexp,
 ) []byte {
 	r, w, _ := os.Pipe()
+	old := os.Stdout
 	os.Stdout = w
 
 	process(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe)
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
+	os.Stdout = old
 	return out
 }
 
