@@ -13,6 +13,7 @@ import (
 var version string
 
 type args struct {
+	Limit   int      `arg:"-l,help:limit line length"`
 	Include []string `arg:"-i,separate,help:include lines which match patterns"`
 	Exclude []string `arg:"-e,separate,help:exclude lines which match patterns"`
 	Tail    []string `arg:"positional,help:highlight patters"`
@@ -44,11 +45,12 @@ func main() {
 	buffer := make([]byte, 0, 64*1024)
 	scanner.Buffer(buffer, 1024*1024)
 
-	process(scanner, &args.Tail, tailRe, includeRe, excludeRe)
+	process(scanner, &args.Tail, &args.Limit, tailRe, includeRe, excludeRe)
 }
 
 // Process data from STDIN
-func process(scanner *bufio.Scanner, argsTail *[]string, tailRe *regexp.Regexp, includeRe *regexp.Regexp, excludeRe *regexp.Regexp) {
+func process(scanner *bufio.Scanner, argsTail *[]string, argsLimit *int, tailRe *regexp.Regexp,
+	includeRe *regexp.Regexp, excludeRe *regexp.Regexp) {
 	// Highlight matched pattern
 	colourify := func(match string) string {
 		index, err := getIndex(argsTail, match)
@@ -73,6 +75,11 @@ func process(scanner *bufio.Scanner, argsTail *[]string, tailRe *regexp.Regexp, 
 			if excludeRe.MatchString(newLine) {
 				continue
 			}
+		}
+
+		// Apply limit
+		if *argsLimit != 0 {
+			newLine = limitLine(&newLine, argsLimit)
 		}
 
 		// Print original or colorized line
@@ -116,4 +123,15 @@ func getIndex(array *[]string, element string) (int, error) {
 		}
 	}
 	return 0, errors.New(element + " not found")
+}
+
+// limitLine limits length of the line
+func limitLine(line *string, limit *int) string {
+	const marker = "..."
+	if len(*line) > *limit {
+		var l string
+		l = *line
+		return l[:*limit] + "..."
+	}
+	return *line
 }
