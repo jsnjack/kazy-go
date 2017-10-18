@@ -4,6 +4,8 @@ dependencies:
     - gem install package_cloud
     - gem install fpm
     - gem install deb-s3
+    - git clone git@github.com:jsnjack/monova.git
+    - cd monova && go install
 
 deployment:
   production:
