@@ -2,7 +2,7 @@ BINARY:=kazy
 PWD:=$(shell pwd)
 BUILD_TYPES:=rpm deb
 VERSION=0.0.0
-MONOVA:=$(shell monova -version dot 2> /dev/null)
+MONOVA:=$(shell which monova dot 2> /dev/null)
 
 version:
 ifdef MONOVA
