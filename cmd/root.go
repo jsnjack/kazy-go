@@ -12,6 +12,7 @@ var rootLimit int
 var rootInclude []string
 var rootExclude []string
 var rootVersion bool
+var rootExtract bool
 
 // Version is the version of the application calculated with monova
 var Version string
@@ -42,7 +43,7 @@ var rootCmd = &cobra.Command{
 		buffer := make([]byte, 0, 64*1024)
 		scanner.Buffer(buffer, 1024*1024)
 
-		processData(scanner, &args, rootLimit, tailRe, includeRe, excludeRe)
+		processData(scanner, &args, rootLimit, tailRe, includeRe, excludeRe, rootExtract)
 
 		return nil
 	},
@@ -66,4 +67,5 @@ func init() {
 		&rootExclude, "exclude", "e", rootExclude, "exclude from output lines which match provided patterns",
 	)
 	rootCmd.PersistentFlags().BoolVar(&rootVersion, "version", false, "print version and exit")
+	rootCmd.PersistentFlags().BoolVarP(&rootExtract, "extract", "x", false, "extract matched strings instead of highlighting them")
 }

@@ -44,7 +44,7 @@ func runProcess(
 	old := os.Stdout
 	os.Stdout = w
 
-	processData(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe)
+	processData(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe, false)
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
@@ -202,7 +202,7 @@ func BenchmarkProcess(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		processData(scanner, &argsTail, argsLimit, tailRe, nil, nil)
+		processData(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	}
 }
 
@@ -217,6 +217,6 @@ func BenchmarkProcessWithLimit(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		processData(scanner, &argsTail, argsLimit, tailRe, nil, nil)
+		processData(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	}
 }

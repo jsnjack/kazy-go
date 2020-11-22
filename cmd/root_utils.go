@@ -50,7 +50,7 @@ func limitLine(line *string, limit int) string {
 
 // Process data from STDIN
 func processData(scanner *bufio.Scanner, argsTail *[]string, argsLimit int, tailRe *regexp.Regexp,
-	includeRe *regexp.Regexp, excludeRe *regexp.Regexp) {
+	includeRe *regexp.Regexp, excludeRe *regexp.Regexp, extract bool) {
 	// Highlight matched pattern
 	colourify := func(match string) string {
 		index, err := getIndex(argsTail, match)
@@ -84,7 +84,14 @@ func processData(scanner *bufio.Scanner, argsTail *[]string, argsLimit int, tail
 
 		// Print original or colorized line
 		if tailRe != nil {
-			fmt.Print(tailRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
+			if extract {
+				match := tailRe.FindString(newLine)
+				if match != "" {
+					fmt.Println(match)
+				}
+			} else {
+				fmt.Print(tailRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
+			}
 		} else {
 			fmt.Println(newLine)
 		}
