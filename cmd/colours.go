@@ -1,4 +1,4 @@
-package main
+package cmd
 
 var colourEnd = "\033[0m"
 

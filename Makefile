@@ -1,35 +1,28 @@
-BINARY:=kazy
 PWD:=$(shell pwd)
-BUILD_TYPES:=rpm deb
 VERSION=0.0.0
 MONOVA:=$(shell which monova dot 2> /dev/null)
 
 version:
 ifdef MONOVA
-override VERSION="$(shell monova)"
+override VERSION=$(shell monova)
 else
 	$(info "Install monova (https://github.com/jsnjack/monova) to calculate version")
 endif
 
-test:
-	go test
+bin/kazy: bin/kazy_linux_amd64
+	cp bin/kazy_linux_amd64 bin/kazy
 
-coverage:
-	go test -coverprofile .coverage && go tool cover -html=.coverage && go tool cover -html=.coverage
+bin/kazy_linux_amd64: version main.go cmd/*.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-X github.com/jsnjack/kazy-go/cmd.Version=${VERSION}" -o bin/kazy_linux_amd64
 
-build: version
-	go build -ldflags="-X main.version=${VERSION}" -o ${BINARY}
+bin/kazy_darwin_amd64: version main.go cmd/*.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-X github.com/jsnjack/kazy-go/cmd.Version=${VERSION}" -o bin/kazy_darwin_amd64
 
-dist: build
-	@for type in ${BUILD_TYPES} ; do \
-		cd ${PWD}/dist && fpm --input-type dir --output-type $$type \
-		--name kazy-go --version ${VERSION} --license MIT --no-depends --provides kazy \
-		--vendor jsnjack@gmail.com \
-		--maintainer jsnjack@gmail.com --description "Highlights output from STDIN" \
-		--url https://github.com/jsnjack/kazy-go --force --chdir ${PWD} ./kazy=/usr/bin/kazy; \
-	done
+build: bin/kazy bin/kazy_linux_amd64 bin/kazy_darwin_amd64
 
-clean:
-	go clean
+release: build
+	tar --transform='s,_.*,,' --transform='s,bin/,,' -cz -f bin/kazy_linux_amd64.tar.gz bin/kazy_linux_amd64
+	tar --transform='s,_.*,,' --transform='s,bin/,,' -cz -f bin/kazy_darwin_amd64.tar.gz bin/kazy_darwin_amd64
+	grm release jsnjack/kazy-go -f bin/kazy_linux_amd64.tar.gz -f bin/kazy_darwin_amd64.tar.gz -t "v`monova`"
 
-.PHONY: dist
+.PHONY: version release build

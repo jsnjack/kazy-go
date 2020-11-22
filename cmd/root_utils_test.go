@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bufio"
@@ -35,7 +35,7 @@ func createInfo(result *[]byte, expected *[]byte) string {
 func runProcess(
 	scanner *bufio.Scanner,
 	argsTail *[]string,
-	argsLimit *int,
+	argsLimit int,
 	tailRe *regexp.Regexp,
 	includeRe *regexp.Regexp,
 	excludeRe *regexp.Regexp,
@@ -44,7 +44,7 @@ func runProcess(
 	old := os.Stdout
 	os.Stdout = w
 
-	process(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe)
+	processData(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe)
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
@@ -60,7 +60,7 @@ func TestPassingString(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -74,7 +74,7 @@ func TestIncludeString(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, includeRe, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, includeRe, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -88,7 +88,7 @@ func TestExcludeString(t *testing.T) {
 
 	expected := []byte("qwerty\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, nil, excludeRe)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, excludeRe)
 	assertEqual(t, result, expected)
 }
 
@@ -102,7 +102,7 @@ func TestColourifyString(t *testing.T) {
 
 	expected := []byte("\033[46m1234\033[0m\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -116,7 +116,7 @@ func TestColourifyPercentString(t *testing.T) {
 
 	expected := []byte("\033[46m%\033[0m\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -130,7 +130,7 @@ func TestColourifySquareBracketString(t *testing.T) {
 
 	expected := []byte("\033[46m[\033[0m\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -146,7 +146,7 @@ func TestExcludeIncludeString(t *testing.T) {
 
 	expected := []byte("")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, includeRe, excludeRe)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, includeRe, excludeRe)
 	assertEqual(t, result, expected)
 }
 
@@ -163,7 +163,7 @@ func TestLimitStringSmaller(t *testing.T) {
 
 	expected := []byte("12...\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -175,7 +175,7 @@ func TestLimitStringEqual(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -187,7 +187,7 @@ func TestLimitStringBigger(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, &argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
 	assertEqual(t, result, expected)
 }
 
@@ -202,7 +202,7 @@ func BenchmarkProcess(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		process(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
+		processData(scanner, &argsTail, argsLimit, tailRe, nil, nil)
 	}
 }
 
@@ -217,6 +217,6 @@ func BenchmarkProcessWithLimit(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		process(scanner, &argsTail, &argsLimit, tailRe, nil, nil)
+		processData(scanner, &argsTail, argsLimit, tailRe, nil, nil)
 	}
 }
