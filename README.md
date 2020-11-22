@@ -1,28 +1,21 @@
 kažy-go
 ====
 
-[![CircleCI](https://circleci.com/gh/jsnjack/kazy-go.svg?style=svg)](https://circleci.com/gh/jsnjack/kazy-go)
-
 ### What is it?
-kažy-go is an implementation of the https://github.com/jsnjack/kazy in golang
+kažy is an application that highlights and filters output from STDIN
 
 ### How to use?
 ```
 Highlights output from STDIN
-kažy 1.0
-Usage: kazy [--include INCLUDE] [--exclude EXCLUDE] [TAIL [TAIL ...]]
 
-Positional arguments:
-  TAIL                   highlight patters
+Usage:
+  kazy [<pattern>...] [flags]
 
-Options:
-  --include INCLUDE, -i INCLUDE
-                         include lines which match patterns
-  --exclude EXCLUDE, -e EXCLUDE
-                         exclude lines which match patterns
-  --help, -h             display this help and exit
-  --version              display version and exit
-
+Flags:
+  -e, --exclude stringArray   exclude from output lines which match provided patterns
+  -h, --help                  help for kazy
+  -i, --include stringArray   only include lines which match provided patterns
+  -l, --limit int             limit the length of the line, characters
 ```
 kažy is extremely useful when piping a command:
 ```bash
@@ -32,12 +25,6 @@ kažy is extremely useful when piping a command:
 
 ### How to install
 
-#### Debian
-```bash
-curl -s https://packagecloud.io/install/repositories/jsnjack/kazy-go/script.deb.sh | sudo bash
 ```
-
-#### Fedora
-```bash
-curl -s https://packagecloud.io/install/repositories/jsnjack/kazy-go/script.rpm.sh | sudo bash
+grm install jsnjack/kazy-go
 ```
