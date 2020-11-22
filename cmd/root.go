@@ -19,7 +19,7 @@ var Version string
 
 var rootCmd = &cobra.Command{
 	Use:   "kazy [<pattern>...]",
-	Short: "Highlights output from STDIN",
+	Short: "Highlights, filters and extracts string patterns from STDIN",
 	Args: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceErrors = true
 		if len(args) > len(terminalColours) {

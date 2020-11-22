@@ -2,7 +2,7 @@ kažy-go
 ====
 
 ### What is it?
-kažy is an application that highlights and filters output from STDIN
+kažy is an application that highlights, filters and extracts string patterns from STDIN
 
 ### How to use?
 ```
