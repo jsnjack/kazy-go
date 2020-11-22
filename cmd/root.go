@@ -11,6 +11,10 @@ import (
 var rootLimit int
 var rootInclude []string
 var rootExclude []string
+var rootVersion bool
+
+// Version is the version of the application calculated with monova
+var Version string
 
 var rootCmd = &cobra.Command{
 	Use:   "kazy [<pattern>...]",
@@ -23,6 +27,11 @@ var rootCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		if rootVersion {
+			fmt.Println(Version)
+			return nil
+		}
 
 		tailRe := prepareRegExp(&args)
 		includeRe := prepareRegExp(&rootInclude)
@@ -56,4 +65,5 @@ func init() {
 	rootCmd.PersistentFlags().StringArrayVarP(
 		&rootExclude, "exclude", "e", rootExclude, "exclude from output lines which match provided patterns",
 	)
+	rootCmd.PersistentFlags().BoolVar(&rootVersion, "version", false, "print version and exit")
 }
