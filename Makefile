@@ -25,4 +25,7 @@ release: build
 	tar --transform='s,_.*,,' --transform='s,bin/,,' -cz -f bin/kazy_darwin_amd64.tar.gz bin/kazy_darwin_amd64
 	grm release jsnjack/kazy-go -f bin/kazy_linux_amd64.tar.gz -f bin/kazy_darwin_amd64.tar.gz -t "v`monova`"
 
-.PHONY: version release build
+test:
+	go test github.com/jsnjack/kazy-go/cmd
+
+.PHONY: version release build test
