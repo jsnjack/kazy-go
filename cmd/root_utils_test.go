@@ -39,12 +39,13 @@ func runProcess(
 	tailRe *regexp.Regexp,
 	includeRe *regexp.Regexp,
 	excludeRe *regexp.Regexp,
+	extract bool,
 ) []byte {
 	r, w, _ := os.Pipe()
 	old := os.Stdout
 	os.Stdout = w
 
-	processData(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe, false)
+	processData(scanner, argsTail, argsLimit, tailRe, includeRe, excludeRe, extract)
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
@@ -60,7 +61,7 @@ func TestPassingString(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -73,7 +74,7 @@ func TestIncludeString(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, includeRe, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, includeRe, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -86,7 +87,7 @@ func TestExcludeString(t *testing.T) {
 
 	expected := []byte("qwerty\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, excludeRe)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, excludeRe, false)
 	assertEqual(t, result, expected)
 }
 
@@ -99,7 +100,7 @@ func TestColourifyString(t *testing.T) {
 
 	expected := []byte("\033[46m1234\033[0m\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -113,7 +114,7 @@ func TestColourifyPercentString(t *testing.T) {
 
 	expected := []byte("\033[46m%\033[0m\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -127,7 +128,7 @@ func TestColourifySquareBracketString(t *testing.T) {
 
 	expected := []byte("\033[46m[\033[0m\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -143,7 +144,7 @@ func TestExcludeIncludeString(t *testing.T) {
 
 	expected := []byte("")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, includeRe, excludeRe)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, includeRe, excludeRe, false)
 	assertEqual(t, result, expected)
 }
 
@@ -160,7 +161,7 @@ func TestLimitStringSmaller(t *testing.T) {
 
 	expected := []byte("12...\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -172,7 +173,7 @@ func TestLimitStringEqual(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
@@ -184,7 +185,7 @@ func TestLimitStringBigger(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil)
+	result := runProcess(scanner, &argsTail, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
