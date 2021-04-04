@@ -39,10 +39,8 @@ func getIndex(array *[]string, element string) (int, error) {
 
 // limitLine limits length of the line
 func limitLine(line *string, limit int) string {
-	const marker = "..."
 	if len(*line) > limit {
-		var l string
-		l = *line
+		l := *line
 		return l[:limit] + "..."
 	}
 	return *line
