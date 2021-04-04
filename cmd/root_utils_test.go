@@ -69,8 +69,7 @@ func TestIncludeString(t *testing.T) {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	var argsTail []string
 	var argsLimit int
-	var includeRe *regexp.Regexp
-	includeRe = regexp.MustCompile("(1234)")
+	includeRe := regexp.MustCompile("(1234)")
 
 	expected := []byte("1234\n")
 
@@ -83,8 +82,7 @@ func TestExcludeString(t *testing.T) {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	var argsTail []string
 	var argsLimit int
-	var excludeRe *regexp.Regexp
-	excludeRe = regexp.MustCompile("(1234)")
+	excludeRe := regexp.MustCompile("(1234)")
 
 	expected := []byte("qwerty\n")
 
@@ -97,8 +95,7 @@ func TestColourifyString(t *testing.T) {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	argsTail := []string{input}
 	var argsLimit int
-	var tailRe *regexp.Regexp
-	tailRe = regexp.MustCompile("(1234)")
+	tailRe := regexp.MustCompile("(1234)")
 
 	expected := []byte("\033[46m1234\033[0m\n")
 
@@ -197,8 +194,7 @@ func BenchmarkProcess(b *testing.B) {
 	scanner := bufio.NewScanner(strings.NewReader(sample))
 	var argsTail []string
 	var argsLimit int
-	var tailRe *regexp.Regexp
-	tailRe = regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
+	tailRe := regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -212,8 +208,7 @@ func BenchmarkProcessWithLimit(b *testing.B) {
 	scanner := bufio.NewScanner(strings.NewReader(sample))
 	var argsTail []string
 	argsLimit := 50
-	var tailRe *regexp.Regexp
-	tailRe = regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
+	tailRe := regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
