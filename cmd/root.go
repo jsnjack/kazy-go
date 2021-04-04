@@ -67,5 +67,8 @@ func init() {
 		&rootExclude, "exclude", "e", rootExclude, "exclude from output lines which match provided patterns",
 	)
 	rootCmd.PersistentFlags().BoolVar(&rootVersion, "version", false, "print version and exit")
-	rootCmd.PersistentFlags().BoolVarP(&rootExtractMode, "extract", "x", false, "extract matched strings instead of highlighting them")
+	rootCmd.PersistentFlags().BoolVarP(
+		&rootExtractMode, "extract", "x", false,
+		"extract matched strings instead of highlighting them",
+	)
 }

@@ -189,6 +189,24 @@ func TestLimitStringBigger(t *testing.T) {
 	assertEqual(t, result, expected)
 }
 
+func TestExtractSimplePresent(t *testing.T) {
+	const input = "    ↳ Microsoft Microsoft® Nano Transceiver v2.0	id=10	[slave  keyboard (3)]"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	tail := []string{"3"}
+	tailRe := prepareRegExp(&tail)
+	result := runProcess(scanner, &tail, 0, tailRe, nil, nil, true)
+	assertEqual(t, result, []byte("3\n"))
+}
+
+func TestExtractSimpleWord(t *testing.T) {
+	const input = "    ↳ Microsoft Microsoft® Nano Transceiver v2.0	id=10	[slave  keyboard (3)]"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	tail := []string{"id"}
+	tailRe := prepareRegExp(&tail)
+	result := runProcess(scanner, &tail, 0, tailRe, nil, nil, true)
+	assertEqual(t, result, []byte("id\n"))
+}
+
 func BenchmarkProcess(b *testing.B) {
 	const sample = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 
