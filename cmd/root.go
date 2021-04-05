@@ -35,8 +35,8 @@ var rootCmd = &cobra.Command{
 		}
 
 		colourifyRe := compileRegExp(&args)
-		includeRe := prepareRegExp(&rootInclude)
-		excludeRe := prepareRegExp(&rootExclude)
+		includeRe := compileRegExp(&rootInclude)
+		excludeRe := compileRegExp(&rootExclude)
 
 		scanner := bufio.NewScanner(os.Stdin)
 		// Update max string size from 64 to 1024

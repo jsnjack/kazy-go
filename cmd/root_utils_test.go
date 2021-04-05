@@ -39,8 +39,8 @@ func runProcess(
 	scanner *bufio.Scanner,
 	argsLimit int,
 	colourifyRe []*regexp.Regexp,
-	includeRe *regexp.Regexp,
-	excludeRe *regexp.Regexp,
+	includeRe []*regexp.Regexp,
+	excludeRe []*regexp.Regexp,
 	extract bool,
 ) []byte {
 	r, w, _ := os.Pipe()
@@ -68,7 +68,7 @@ func TestPassingString(t *testing.T) {
 func TestIncludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	includeRe := regexp.MustCompile("(1234)")
+	includeRe := compileRegExp(&[]string{"1234"})
 
 	expected := []byte("1234\n")
 
@@ -79,7 +79,7 @@ func TestIncludeString(t *testing.T) {
 func TestExcludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	excludeRe := regexp.MustCompile("(1234)")
+	excludeRe := compileRegExp(&[]string{"1234"})
 
 	expected := []byte("qwerty\n")
 
@@ -145,20 +145,13 @@ func TestColourifySquareBracketString(t *testing.T) {
 func TestExcludeIncludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var excludeRe *regexp.Regexp
-	var includeRe *regexp.Regexp
-	excludeRe = regexp.MustCompile("(1234)")
-	includeRe = regexp.MustCompile("(1234)")
+	excludeRe := compileRegExp(&[]string{"1234"})
+	includeRe := compileRegExp(&[]string{"1234"})
 
 	expected := []byte("")
 
 	result := runProcess(scanner, 0, nil, includeRe, excludeRe, false)
 	assertEqual(t, result, expected)
-}
-
-func TestEscapeInRegexp(t *testing.T) {
-	test := []string{"["}
-	prepareRegExp(&test)
 }
 
 func TestLimitStringSmaller(t *testing.T) {
