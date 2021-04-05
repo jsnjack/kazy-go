@@ -13,6 +13,7 @@ var rootInclude []string
 var rootExclude []string
 var rootVersion bool
 var rootExtractMode bool
+var rootRegExpMode bool
 
 // Version is the version of the application calculated with monova
 var Version string
@@ -34,9 +35,9 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
-		colourifyRe := compileRegExp(&args)
-		includeRe := compileRegExp(&rootInclude)
-		excludeRe := compileRegExp(&rootExclude)
+		colourifyRe := compileRegExp(&args, rootRegExpMode)
+		includeRe := compileRegExp(&rootInclude, rootRegExpMode)
+		excludeRe := compileRegExp(&rootExclude, rootRegExpMode)
 
 		scanner := bufio.NewScanner(os.Stdin)
 		// Update max string size from 64 to 1024
@@ -44,7 +45,7 @@ var rootCmd = &cobra.Command{
 		buffer := make([]byte, 0, 64*1024)
 		scanner.Buffer(buffer, 1024*1024)
 
-		processData(scanner, rootLimit, colourifyRe, includeRe, excludeRe, rootExtractMode)
+		processData(scanner, rootLimit, colourifyRe, includeRe, excludeRe, rootExtractMode, rootRegExpMode)
 
 		return nil
 	},
@@ -71,5 +72,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(
 		&rootExtractMode, "extract", "x", false,
 		"extract matched strings instead of highlighting them",
+	)
+	rootCmd.PersistentFlags().BoolVarP(
+		&rootRegExpMode, "regexp", "r", false,
+		"use RegExp patterns instead of string patterns",
 	)
 }

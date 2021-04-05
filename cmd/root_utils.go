@@ -7,10 +7,14 @@ import (
 )
 
 // Returns list of regular expressions
-func compileRegExp(args *[]string) []*regexp.Regexp {
+func compileRegExp(args *[]string, regExpMode bool) []*regexp.Regexp {
 	all := make([]*regexp.Regexp, 0)
 	for _, item := range *args {
-		all = append(all, regexp.MustCompile(regexp.QuoteMeta(item)))
+		if regExpMode {
+			all = append(all, regexp.MustCompile(item))
+		} else {
+			all = append(all, regexp.MustCompile(regexp.QuoteMeta(item)))
+		}
 	}
 	return all
 }
@@ -36,7 +40,7 @@ func limitLine(line *string, limit int) string {
 
 // Process data from STDIN
 func processData(scanner *bufio.Scanner, argsLimit int, colourifyRe []*regexp.Regexp,
-	includeRe []*regexp.Regexp, excludeRe []*regexp.Regexp, extract bool) {
+	includeRe []*regexp.Regexp, excludeRe []*regexp.Regexp, extract bool, regexpMode bool) {
 
 	for scanner.Scan() {
 		newLine := scanner.Text()
