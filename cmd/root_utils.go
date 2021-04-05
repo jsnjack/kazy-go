@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"regexp"
 )
@@ -27,14 +26,13 @@ func generateRegExp(args *[]string) string {
 	return re
 }
 
-// Returns position of the element in the array
-func getIndex(array *[]string, element string) (int, error) {
-	for index, value := range *array {
-		if value == element {
-			return index, nil
-		}
+// Returns list of regular expressions
+func compileRegExp(args *[]string) []*regexp.Regexp {
+	all := make([]*regexp.Regexp, 0)
+	for _, item := range *args {
+		all = append(all, regexp.MustCompile(regexp.QuoteMeta(item)))
 	}
-	return 0, errors.New(element + " not found")
+	return all
 }
 
 // limitLine limits length of the line
@@ -47,16 +45,8 @@ func limitLine(line *string, limit int) string {
 }
 
 // Process data from STDIN
-func processData(scanner *bufio.Scanner, argsColourify *[]string, argsLimit int, colourifyRe *regexp.Regexp,
+func processData(scanner *bufio.Scanner, argsLimit int, colourifyRe []*regexp.Regexp,
 	includeRe *regexp.Regexp, excludeRe *regexp.Regexp, extract bool) {
-	// Highlight matched pattern
-	colourify := func(match string) string {
-		index, err := getIndex(argsColourify, match)
-		if err != nil {
-			return match
-		}
-		return terminalColours[index] + match + colourEnd
-	}
 
 	for scanner.Scan() {
 		newLine := scanner.Text()
@@ -83,12 +73,22 @@ func processData(scanner *bufio.Scanner, argsColourify *[]string, argsLimit int,
 		// Print original or colorized line
 		if colourifyRe != nil {
 			if extract {
-				match := colourifyRe.FindString(newLine)
-				if match != "" {
-					fmt.Println(match)
+				var match string
+				for _, reItem := range colourifyRe {
+					match = reItem.FindString(newLine)
+					if match != "" {
+						fmt.Println(match)
+						break
+					}
 				}
 			} else {
-				fmt.Print(colourifyRe.ReplaceAllStringFunc(newLine, colourify) + "\n")
+				for idx, reItem := range colourifyRe {
+					colourify := func(match string) string {
+						return terminalColours[idx] + match + colourEnd
+					}
+					newLine = reItem.ReplaceAllStringFunc(newLine, colourify)
+				}
+				fmt.Println(newLine)
 			}
 		} else {
 			fmt.Println(newLine)

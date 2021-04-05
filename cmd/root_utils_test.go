@@ -37,9 +37,8 @@ func createInfo(result *[]byte, expected *[]byte) string {
 
 func runProcess(
 	scanner *bufio.Scanner,
-	argsColourify *[]string,
 	argsLimit int,
-	colourifyRe *regexp.Regexp,
+	colourifyRe []*regexp.Regexp,
 	includeRe *regexp.Regexp,
 	excludeRe *regexp.Regexp,
 	extract bool,
@@ -48,7 +47,7 @@ func runProcess(
 	old := os.Stdout
 	os.Stdout = w
 
-	processData(scanner, argsColourify, argsLimit, colourifyRe, includeRe, excludeRe, extract)
+	processData(scanner, argsLimit, colourifyRe, includeRe, excludeRe, extract)
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
@@ -59,113 +58,93 @@ func runProcess(
 func TestPassingString(t *testing.T) {
 	const input = "1234"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
-	var argsLimit int
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, nil, nil, false)
+	result := runProcess(scanner, 0, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestIncludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
-	var argsLimit int
 	includeRe := regexp.MustCompile("(1234)")
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, includeRe, nil, false)
+	result := runProcess(scanner, 0, nil, includeRe, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestExcludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
-	var argsLimit int
 	excludeRe := regexp.MustCompile("(1234)")
 
 	expected := []byte("qwerty\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, nil, excludeRe, false)
+	result := runProcess(scanner, 0, nil, nil, excludeRe, false)
 	assertEqual(t, result, expected)
 }
 
 func TestColourifyString(t *testing.T) {
 	const input = "1234"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	argsColourify := []string{input}
-	var argsLimit int
-	colourifyRe := regexp.MustCompile("(1234)")
+	colourifyRe := compileRegExp(&[]string{"1234"})
 
 	expected := []byte("\033[46m1234\033[0m\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestColourifyMultiple1(t *testing.T) {
 	const input = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	argsColourify := []string{"5", "dell", "firefox", "403", "modules/", "loader.js"}
-	var argsLimit int
-	colourifyRe := prepareRegExp(&argsColourify)
+	colourifyRe := compileRegExp(&[]string{"5", "dell", "firefox", "403", "modules/", "loader.js"})
 
 	expected := []byte("Jun 0\033[46m5\033[0m 18:17:32 \033[41mdell\033[0m \033[42mfirefox\033[0m.desktop[4089]: onEvent@resource://gre/\033[44mmodules/\033[0mcommonjs/toolkit/\033[45mloader.js\033[0m\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestColourifyMultiple2(t *testing.T) {
 	const input = "1 2 1 2"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	argsColourify := []string{"2"}
-	var argsLimit int
-	colourifyRe := prepareRegExp(&argsColourify)
+	colourifyRe := compileRegExp(&[]string{"2"})
 
 	expected := []byte("1 \033[46m2\033[0m 1 \033[46m2\033[0m\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestColourifyPercentString(t *testing.T) {
 	const input = "%"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	argsColourify := []string{input}
-	var colourifyRe *regexp.Regexp
-	var argsLimit int
-	colourifyRe = regexp.MustCompile("(%)")
+	colourifyRe := compileRegExp(&[]string{"%"})
 
 	expected := []byte("\033[46m%\033[0m\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestColourifySquareBracketString(t *testing.T) {
 	const input = "["
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	argsColourify := []string{input}
-	var colourifyRe *regexp.Regexp
-	var argsLimit int
-	colourifyRe = prepareRegExp(&argsColourify)
+	colourifyRe := compileRegExp(&[]string{input})
 
 	expected := []byte("\033[46m[\033[0m\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestExcludeIncludeString(t *testing.T) {
 	const input = "1234\nqwerty"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
-	var argsLimit int
 	var excludeRe *regexp.Regexp
 	var includeRe *regexp.Regexp
 	excludeRe = regexp.MustCompile("(1234)")
@@ -173,7 +152,7 @@ func TestExcludeIncludeString(t *testing.T) {
 
 	expected := []byte("")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, includeRe, excludeRe, false)
+	result := runProcess(scanner, 0, nil, includeRe, excludeRe, false)
 	assertEqual(t, result, expected)
 }
 
@@ -185,69 +164,63 @@ func TestEscapeInRegexp(t *testing.T) {
 func TestLimitStringSmaller(t *testing.T) {
 	const input = "1234"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
 	argsLimit := 2
 
 	expected := []byte("12...\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, nil, nil, false)
+	result := runProcess(scanner, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestLimitStringEqual(t *testing.T) {
 	const input = "1234"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
 	argsLimit := 4
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, nil, nil, false)
+	result := runProcess(scanner, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestLimitStringBigger(t *testing.T) {
 	const input = "1234"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var argsColourify []string
 	argsLimit := 10
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, &argsColourify, argsLimit, nil, nil, nil, false)
+	result := runProcess(scanner, argsLimit, nil, nil, nil, false)
 	assertEqual(t, result, expected)
 }
 
 func TestExtractSimplePresent(t *testing.T) {
 	const input = "    ↳ Microsoft Microsoft® Nano Transceiver v2.0	id=10	[slave  keyboard (3)]"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	tail := []string{"3"}
-	colourifyRe := prepareRegExp(&tail)
-	result := runProcess(scanner, &tail, 0, colourifyRe, nil, nil, true)
+	colourifyRe := compileRegExp(&[]string{"3"})
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, true)
 	assertEqual(t, result, []byte("3\n"))
 }
 
 func TestExtractSimpleWord(t *testing.T) {
 	const input = "    ↳ Microsoft Microsoft® Nano Transceiver v2.0	id=10	[slave  keyboard (3)]"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	tail := []string{"id"}
-	colourifyRe := prepareRegExp(&tail)
-	result := runProcess(scanner, &tail, 0, colourifyRe, nil, nil, true)
+	colourifyRe := compileRegExp(&[]string{"id"})
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, true)
 	assertEqual(t, result, []byte("id\n"))
 }
 
 func BenchmarkProcess(b *testing.B) {
 	// 2021-04-05: 12.68 ns/op	       0 B/op	       0 allocs/op
+	//
 	const sample = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 
 	scanner := bufio.NewScanner(strings.NewReader(sample))
-	var argsColourify []string
-	var argsLimit int
-	colourifyRe := regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
+	colourifyRe := compileRegExp(&[]string{"5", "firefox", "dell", "o", "s"})
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		processData(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+		processData(scanner, 0, colourifyRe, nil, nil, false)
 	}
 }
 
@@ -255,12 +228,10 @@ func BenchmarkProcessWithLimit(b *testing.B) {
 	const sample = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 
 	scanner := bufio.NewScanner(strings.NewReader(sample))
-	var argsColourify []string
-	argsLimit := 50
-	colourifyRe := regexp.MustCompile("(5)|(firefox)|(dell)|(o)|(s)")
+	colourifyRe := compileRegExp(&[]string{"5", "firefox", "dell", "o", "s"})
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		processData(scanner, &argsColourify, argsLimit, colourifyRe, nil, nil, false)
+		processData(scanner, 50, colourifyRe, nil, nil, false)
 	}
 }

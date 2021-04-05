@@ -34,16 +34,17 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
-		colourifyRe := prepareRegExp(&args)
+		colourifyRe := compileRegExp(&args)
 		includeRe := prepareRegExp(&rootInclude)
 		excludeRe := prepareRegExp(&rootExclude)
 
 		scanner := bufio.NewScanner(os.Stdin)
 		// Update max string size from 64 to 1024
+		// Move to arguments
 		buffer := make([]byte, 0, 64*1024)
 		scanner.Buffer(buffer, 1024*1024)
 
-		processData(scanner, &args, rootLimit, colourifyRe, includeRe, excludeRe, rootExtractMode)
+		processData(scanner, rootLimit, colourifyRe, includeRe, excludeRe, rootExtractMode)
 
 		return nil
 	},
