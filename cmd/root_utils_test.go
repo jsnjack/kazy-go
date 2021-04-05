@@ -212,6 +212,30 @@ func TestRegexpMode1(t *testing.T) {
 	assertEqual(t, result, []byte("hello \033[46m1\033[0m joe\n"))
 }
 
+func TestBufferSizeOkay(t *testing.T) {
+	var input string
+	x := 1
+	for x < 64*1024 {
+		input = input + "1"
+		x = x + 1
+	}
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	result := runProcess(scanner, 0, nil, nil, nil, false, false)
+	assertEqual(t, result, []byte(input+"\n"))
+}
+
+func TestBufferSizeTooBig(t *testing.T) {
+	var input string
+	x := 1
+	for x < 65*1024 {
+		input = input + "1"
+		x = x + 1
+	}
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	result := runProcess(scanner, 0, nil, nil, nil, false, false)
+	assertEqual(t, result, []byte("bufio.Scanner: token too long\n"))
+}
+
 func BenchmarkProcess(b *testing.B) {
 	// 237f079: 12.68 ns/op	       0 B/op	       0 allocs/op
 	// 50c11e0: 12.44 ns/op	       0 B/op	       0 allocs/op

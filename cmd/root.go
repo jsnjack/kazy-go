@@ -14,6 +14,7 @@ var rootExclude []string
 var rootVersion bool
 var rootExtractMode bool
 var rootRegExpMode bool
+var bufferSize int
 
 // Version is the version of the application calculated with monova
 var Version string
@@ -40,10 +41,8 @@ var rootCmd = &cobra.Command{
 		excludeRe := compileRegExp(&rootExclude, rootRegExpMode)
 
 		scanner := bufio.NewScanner(os.Stdin)
-		// Update max string size from 64 to 1024
-		// Move to arguments
-		buffer := make([]byte, 0, 64*1024)
-		scanner.Buffer(buffer, 1024*1024)
+		buffer := make([]byte, 0, bufferSize*1024)
+		scanner.Buffer(buffer, bufferSize*1024)
 
 		processData(scanner, rootLimit, colourifyRe, includeRe, excludeRe, rootExtractMode, rootRegExpMode)
 
@@ -62,6 +61,7 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().IntVarP(&rootLimit, "limit", "l", rootLimit, "limit the length of the line, characters")
+	rootCmd.PersistentFlags().IntVarP(&bufferSize, "buffer", "b", 64, "buffer size in KB")
 	rootCmd.PersistentFlags().StringArrayVarP(
 		&rootInclude, "include", "i", rootInclude, "only include lines which match provided patterns",
 	)
