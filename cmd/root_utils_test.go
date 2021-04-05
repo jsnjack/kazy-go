@@ -211,8 +211,8 @@ func TestExtractSimpleWord(t *testing.T) {
 }
 
 func BenchmarkProcess(b *testing.B) {
-	// 2021-04-05: 12.68 ns/op	       0 B/op	       0 allocs/op
-	//
+	// 237f079: 12.68 ns/op	       0 B/op	       0 allocs/op
+	// 50c11e0: 12.44 ns/op	       0 B/op	       0 allocs/op
 	const sample = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 
 	scanner := bufio.NewScanner(strings.NewReader(sample))
