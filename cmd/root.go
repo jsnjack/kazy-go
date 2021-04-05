@@ -82,7 +82,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&rootVersion, "version", false, "print version and exit")
 	rootCmd.PersistentFlags().BoolVarP(
 		&rootExtractMode, "extract", "x", false,
-		"extract matched strings instead of highlighting them",
+		"extract matched strings (leftmost) instead of highlighting them",
 	)
 	rootCmd.PersistentFlags().BoolVarP(
 		&rootRegExpMode, "regexp", "r", false,

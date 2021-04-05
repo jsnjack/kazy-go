@@ -66,12 +66,14 @@ func processData(scanner *bufio.Scanner, argsLimit int, colourifyRe []*regexp.Re
 		// Print original or colorized line
 		if colourifyRe != nil {
 			if extract {
-				var match string
 				for _, reItem := range colourifyRe {
-					match = reItem.FindString(newLine)
-					if match != "" {
-						fmt.Println(match)
-						break
+					// Extract leftmost match
+					result := reItem.FindAllString(newLine, -1)
+					for _, i := range result {
+						if i != "" {
+							fmt.Println(i)
+							break
+						}
 					}
 				}
 			} else {

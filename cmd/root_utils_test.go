@@ -220,6 +220,14 @@ func TestRegexpMode2(t *testing.T) {
 	assertEqual(t, result, []byte("hello \033[46m1\033[0m joe \033[46m1\033[0m\n"))
 }
 
+func TestRegexpModeWithExtract1(t *testing.T) {
+	const input = "h 11 j 11 1"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	colourifyRe, _ := compileRegExp(&[]string{`\d*`}, true)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, true, true)
+	assertEqual(t, result, []byte("11\n"))
+}
+
 func TestBufferSizeOkay(t *testing.T) {
 	var input string
 	x := 1
