@@ -42,12 +42,12 @@ func processData(scanner *bufio.Scanner, argsLimit int, colourifyRe []*regexp.Re
 		newLine := scanner.Text()
 
 		// Check if the line should be included in the output
-		if includeRe != nil && !matchesRegExpList(&newLine, includeRe) {
+		if len(includeRe) != 0 && !matchesRegExpList(&newLine, includeRe) {
 			continue
 		}
 
 		// Check if the line should be excluded from the output
-		if excludeRe != nil && matchesRegExpList(&newLine, excludeRe) {
+		if len(excludeRe) != 0 && matchesRegExpList(&newLine, excludeRe) {
 			continue
 		}
 
