@@ -107,7 +107,7 @@ func TestColourifyString(t *testing.T) {
 	assertEqual(t, result, expected)
 }
 
-func TestColourifyMultiple(t *testing.T) {
+func TestColourifyMultiple1(t *testing.T) {
 	const input = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	argsTail := []string{"5", "dell", "firefox", "403", "modules/", "loader.js"}
@@ -115,6 +115,19 @@ func TestColourifyMultiple(t *testing.T) {
 	tailRe := prepareRegExp(&argsTail)
 
 	expected := []byte("Jun 0\033[46m5\033[0m 18:17:32 \033[41mdell\033[0m \033[42mfirefox\033[0m.desktop[4089]: onEvent@resource://gre/\033[44mmodules/\033[0mcommonjs/toolkit/\033[45mloader.js\033[0m\n")
+
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
+	assertEqual(t, result, expected)
+}
+
+func TestColourifyMultiple2(t *testing.T) {
+	const input = "1 2 1 2"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	argsTail := []string{"2"}
+	var argsLimit int
+	tailRe := prepareRegExp(&argsTail)
+
+	expected := []byte("1 \033[46m2\033[0m 1 \033[46m2\033[0m\n")
 
 	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	assertEqual(t, result, expected)
