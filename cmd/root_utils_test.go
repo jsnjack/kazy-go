@@ -25,10 +25,13 @@ func assertEqual(t *testing.T, result []byte, expected []byte) {
 
 func createInfo(result *[]byte, expected *[]byte) string {
 	var info string
-	info = "Result vs expected:\n"
-	info += fmt.Sprintf("length: %v vs %v\n", len(*result), len(*expected))
-	info += fmt.Sprintf("bytes: %v vs %v\n", *result, *expected)
-	info += fmt.Sprintf("bytes: %s vs %s\n", *result, *expected)
+	info = "\nDescription:\n"
+	info += fmt.Sprintf("     got length: %v\n", len(*result))
+	info += fmt.Sprintf("expected length: %v\n", len(*expected))
+	info += fmt.Sprintf("     got bytes: %v\n", *result)
+	info += fmt.Sprintf("expected bytes: %v\n", *expected)
+	info += fmt.Sprintf("     got strings: %s\n", *result)
+	info += fmt.Sprintf("expected strings: %s\n", *expected)
 	return info
 }
 
@@ -99,6 +102,19 @@ func TestColourifyString(t *testing.T) {
 	tailRe := regexp.MustCompile("(1234)")
 
 	expected := []byte("\033[46m1234\033[0m\n")
+
+	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
+	assertEqual(t, result, expected)
+}
+
+func TestColourifyMultiple(t *testing.T) {
+	const input = "Jun 05 18:17:32 dell firefox.desktop[4089]: onEvent@resource://gre/modules/commonjs/toolkit/loader.js"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	argsTail := []string{"5", "dell", "firefox", "403", "modules/", "loader.js"}
+	var argsLimit int
+	tailRe := prepareRegExp(&argsTail)
+
+	expected := []byte("Jun 0\033[46m5\033[0m 18:17:32 \033[41mdell\033[0m \033[42mfirefox\033[0m.desktop[4089]: onEvent@resource://gre/\033[44mmodules/\033[0mcommonjs/toolkit/\033[45mloader.js\033[0m\n")
 
 	result := runProcess(scanner, &argsTail, argsLimit, tailRe, nil, nil, false)
 	assertEqual(t, result, expected)
