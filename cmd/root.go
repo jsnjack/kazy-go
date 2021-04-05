@@ -23,7 +23,7 @@ var rootCmd = &cobra.Command{
 	Args: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceErrors = true
 		if len(args) > len(terminalColours) {
-			return fmt.Errorf("tail limit reached: %d", len(terminalColours))
+			return fmt.Errorf("pattern limit reached: %d", len(terminalColours))
 		}
 		return nil
 	},
@@ -34,7 +34,7 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
-		tailRe := prepareRegExp(&args)
+		colourifyRe := prepareRegExp(&args)
 		includeRe := prepareRegExp(&rootInclude)
 		excludeRe := prepareRegExp(&rootExclude)
 
@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 		buffer := make([]byte, 0, 64*1024)
 		scanner.Buffer(buffer, 1024*1024)
 
-		processData(scanner, &args, rootLimit, tailRe, includeRe, excludeRe, rootExtractMode)
+		processData(scanner, &args, rootLimit, colourifyRe, includeRe, excludeRe, rootExtractMode)
 
 		return nil
 	},
