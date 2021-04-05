@@ -7,16 +7,19 @@ import (
 )
 
 // Returns list of regular expressions
-func compileRegExp(args *[]string, regExpMode bool) []*regexp.Regexp {
+func compileRegExp(args *[]string, regExpMode bool) ([]*regexp.Regexp, error) {
 	all := make([]*regexp.Regexp, 0)
 	for _, item := range *args {
-		if regExpMode {
-			all = append(all, regexp.MustCompile(item))
-		} else {
-			all = append(all, regexp.MustCompile(regexp.QuoteMeta(item)))
+		if !regExpMode {
+			item = regexp.QuoteMeta(item)
 		}
+		pattern, err := regexp.Compile(item)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, pattern)
 	}
-	return all
+	return all, nil
 }
 
 // Returns true if one of the regexp patterns matches the line

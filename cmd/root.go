@@ -36,9 +36,20 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
-		colourifyRe := compileRegExp(&args, rootRegExpMode)
-		includeRe := compileRegExp(&rootInclude, rootRegExpMode)
-		excludeRe := compileRegExp(&rootExclude, rootRegExpMode)
+		colourifyRe, err := compileRegExp(&args, rootRegExpMode)
+		if err != nil {
+			return err
+		}
+
+		includeRe, err := compileRegExp(&rootInclude, rootRegExpMode)
+		if err != nil {
+			return err
+		}
+
+		excludeRe, err := compileRegExp(&rootExclude, rootRegExpMode)
+		if err != nil {
+			return err
+		}
 
 		scanner := bufio.NewScanner(os.Stdin)
 		buffer := make([]byte, 0, bufferSize*1024)
