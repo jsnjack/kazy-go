@@ -12,7 +12,7 @@ var rootLimit int
 var rootInclude []string
 var rootExclude []string
 var rootVersion bool
-var rootExtractMode bool
+var rootExtractMode int
 var rootRegExpMode bool
 var bufferSize int
 
@@ -80,9 +80,9 @@ func init() {
 		&rootExclude, "exclude", "e", rootExclude, "exclude from output lines which match provided patterns",
 	)
 	rootCmd.PersistentFlags().BoolVar(&rootVersion, "version", false, "print version and exit")
-	rootCmd.PersistentFlags().BoolVarP(
-		&rootExtractMode, "extract", "x", false,
-		"extract matched strings (leftmost) instead of highlighting them",
+	rootCmd.PersistentFlags().CountVarP(
+		&rootExtractMode, "extract", "x",
+		"extract instead of highlighting. Can be provided multiple times to control which matched string is extracted",
 	)
 	rootCmd.PersistentFlags().BoolVarP(
 		&rootRegExpMode, "regexp", "r", false,

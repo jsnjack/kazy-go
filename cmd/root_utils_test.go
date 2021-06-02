@@ -41,7 +41,7 @@ func runProcess(
 	colourifyRe []*regexp.Regexp,
 	includeRe []*regexp.Regexp,
 	excludeRe []*regexp.Regexp,
-	extract bool,
+	extract int,
 	regExpMode bool,
 ) []byte {
 	r, w, _ := os.Pipe()
@@ -62,7 +62,7 @@ func TestPassingString(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, 0, nil, nil, nil, false, false)
+	result := runProcess(scanner, 0, nil, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -73,7 +73,7 @@ func TestIncludeString(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, 0, nil, includeRe, nil, false, false)
+	result := runProcess(scanner, 0, nil, includeRe, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -84,7 +84,7 @@ func TestExcludeString(t *testing.T) {
 
 	expected := []byte("qwerty\n")
 
-	result := runProcess(scanner, 0, nil, nil, excludeRe, false, false)
+	result := runProcess(scanner, 0, nil, nil, excludeRe, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -95,7 +95,7 @@ func TestColourifyString(t *testing.T) {
 
 	expected := []byte("\033[46m1234\033[0m\n")
 
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -106,7 +106,7 @@ func TestColourifyMultiple1(t *testing.T) {
 
 	expected := []byte("Jun 0\033[46m5\033[0m 18:17:32 \033[41mdell\033[0m \033[42mfirefox\033[0m.desktop[4089]: onEvent@resource://gre/\033[44mmodules/\033[0mcommonjs/toolkit/\033[45mloader.js\033[0m\n")
 
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -117,7 +117,7 @@ func TestColourifyMultiple2(t *testing.T) {
 
 	expected := []byte("1 \033[46m2\033[0m 1 \033[46m2\033[0m\n")
 
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -128,7 +128,7 @@ func TestColourifyPercentString(t *testing.T) {
 
 	expected := []byte("\033[46m%\033[0m\n")
 
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -139,7 +139,7 @@ func TestColourifySquareBracketString(t *testing.T) {
 
 	expected := []byte("\033[46m[\033[0m\n")
 
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -151,7 +151,7 @@ func TestExcludeIncludeString(t *testing.T) {
 
 	expected := []byte("")
 
-	result := runProcess(scanner, 0, nil, includeRe, excludeRe, false, false)
+	result := runProcess(scanner, 0, nil, includeRe, excludeRe, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -162,7 +162,7 @@ func TestLimitStringSmaller(t *testing.T) {
 
 	expected := []byte("12...\n")
 
-	result := runProcess(scanner, argsLimit, nil, nil, nil, false, false)
+	result := runProcess(scanner, argsLimit, nil, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -173,7 +173,7 @@ func TestLimitStringEqual(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, argsLimit, nil, nil, nil, false, false)
+	result := runProcess(scanner, argsLimit, nil, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -184,7 +184,7 @@ func TestLimitStringBigger(t *testing.T) {
 
 	expected := []byte("1234\n")
 
-	result := runProcess(scanner, argsLimit, nil, nil, nil, false, false)
+	result := runProcess(scanner, argsLimit, nil, nil, nil, 0, false)
 	assertEqual(t, result, expected)
 }
 
@@ -192,7 +192,7 @@ func TestExtractSimplePresent(t *testing.T) {
 	const input = "    ↳ Microsoft Microsoft® Nano Transceiver v2.0	id=10	[slave  keyboard (3)]"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	colourifyRe, _ := compileRegExp(&[]string{"3"}, false)
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, true, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 1, false)
 	assertEqual(t, result, []byte("3\n"))
 }
 
@@ -200,7 +200,7 @@ func TestExtractSimpleWord(t *testing.T) {
 	const input = "    ↳ Microsoft Microsoft® Nano Transceiver v2.0	id=10	[slave  keyboard (3)]"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	colourifyRe, _ := compileRegExp(&[]string{"id"}, false)
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, true, false)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 1, false)
 	assertEqual(t, result, []byte("id\n"))
 }
 
@@ -208,7 +208,7 @@ func TestRegexpMode1(t *testing.T) {
 	const input = "hello 1 joe"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	colourifyRe, _ := compileRegExp(&[]string{`\d`}, true)
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, true)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, true)
 	assertEqual(t, result, []byte("hello \033[46m1\033[0m joe\n"))
 }
 
@@ -216,7 +216,7 @@ func TestRegexpMode2(t *testing.T) {
 	const input = "hello 1 joe 1"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	colourifyRe, _ := compileRegExp(&[]string{`\d`}, true)
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, false, true)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 0, true)
 	assertEqual(t, result, []byte("hello \033[46m1\033[0m joe \033[46m1\033[0m\n"))
 }
 
@@ -224,8 +224,25 @@ func TestRegexpModeWithExtract1(t *testing.T) {
 	const input = "h 11 j 11 1"
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	colourifyRe, _ := compileRegExp(&[]string{`\d*`}, true)
-	result := runProcess(scanner, 0, colourifyRe, nil, nil, true, true)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 1, true)
 	assertEqual(t, result, []byte("11\n"))
+}
+
+func TestRegexpModeWithExtract2(t *testing.T) {
+	const input = "h 11 j 11 1"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	colourifyRe, _ := compileRegExp(&[]string{`\d*`}, true)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 3, true)
+	assertEqual(t, result, []byte("1\n"))
+}
+
+func TestRegexpModeWithExtract3(t *testing.T) {
+	// Too many
+	const input = "h 11 j 11 1"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	colourifyRe, _ := compileRegExp(&[]string{`\d*`}, true)
+	result := runProcess(scanner, 0, colourifyRe, nil, nil, 4, true)
+	assertEqual(t, result, []byte(""))
 }
 
 func TestBufferSizeOkay(t *testing.T) {
@@ -236,7 +253,7 @@ func TestBufferSizeOkay(t *testing.T) {
 		x = x + 1
 	}
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	result := runProcess(scanner, 0, nil, nil, nil, false, false)
+	result := runProcess(scanner, 0, nil, nil, nil, 0, false)
 	assertEqual(t, result, []byte(input+"\n"))
 }
 
@@ -248,7 +265,7 @@ func TestBufferSizeTooBig(t *testing.T) {
 		x = x + 1
 	}
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	result := runProcess(scanner, 0, nil, nil, nil, false, false)
+	result := runProcess(scanner, 0, nil, nil, nil, 0, false)
 	assertEqual(t, result, []byte("bufio.Scanner: token too long\n"))
 }
 
@@ -262,7 +279,7 @@ func BenchmarkProcess(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		processData(scanner, 0, colourifyRe, nil, nil, false, false)
+		processData(scanner, 0, colourifyRe, nil, nil, 0, false)
 	}
 }
 
@@ -274,6 +291,6 @@ func BenchmarkProcessWithLimit(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		processData(scanner, 50, colourifyRe, nil, nil, false, false)
+		processData(scanner, 50, colourifyRe, nil, nil, 0, false)
 	}
 }
