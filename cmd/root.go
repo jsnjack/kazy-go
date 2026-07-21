@@ -15,6 +15,8 @@ var rootVersion bool
 var rootExtractMode int
 var rootRegExpMode bool
 var bufferSize int
+var rootDebug bool
+var rootTrace bool
 
 // Version is the version of the application calculated with monova
 var Version string
@@ -30,6 +32,15 @@ var rootCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		level, tracePath := "", ""
+		switch {
+		case rootTrace:
+			level, tracePath = "trace", "/tmp/kazy.log"
+		case rootDebug:
+			level = "debug"
+		}
+		cleanup := initLogger(tracePath, level)
+		defer cleanup()
 
 		if rootVersion {
 			fmt.Println(Version)
@@ -87,5 +98,11 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(
 		&rootRegExpMode, "regexp", "r", false,
 		"use RegExp patterns instead of string patterns",
+	)
+	rootCmd.PersistentFlags().BoolVarP(
+		&rootDebug, "debug", "d", false, "Debug-level logging on stderr.",
+	)
+	rootCmd.PersistentFlags().BoolVar(
+		&rootTrace, "trace", false, "Trace-level logs to /tmp/kazy.log (truncated each run).",
 	)
 }

@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"log/slog"
 	"regexp"
 )
 
@@ -15,7 +16,7 @@ func compileRegExp(args *[]string, regExpMode bool) ([]*regexp.Regexp, error) {
 		}
 		pattern, err := regexp.Compile(item)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("compile pattern %q: %w", item, err)
 		}
 		all = append(all, pattern)
 	}
@@ -93,8 +94,7 @@ func processData(scanner *bufio.Scanner, argsLimit int, colourifyRe []*regexp.Re
 			fmt.Println(newLine)
 		}
 	}
-	err := scanner.Err()
-	if err != nil {
-		fmt.Println(err.Error())
+	if err := scanner.Err(); err != nil {
+		slog.Error("read stdin", "err", err)
 	}
 }

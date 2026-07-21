@@ -1,7 +1,6 @@
+bin/
 kazy
 kazy-go
 .vscode
-kazy.log
 .coverage
-.monova.cache
-.monova.history
+.monova*
